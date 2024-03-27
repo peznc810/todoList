@@ -9,7 +9,7 @@ console.log(route.name)
 <template>
   <div class="wrapper h-screen w-screen bg-zinc-100 text-gray-700">
     <div class="container mx-auto">
-      <nav class="flex justify-center gap-2 py-8">
+      <nav class="flex justify-center space-x-2 py-8">
         <RouterLink
           to="/"
           class="font-bold underline underline-offset-4 transition-colors duration-150 ease-in"

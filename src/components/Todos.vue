@@ -1,5 +1,6 @@
 <script setup>
-import { ref, Transition } from 'vue'
+import { ref, Transition, watch, onMounted } from 'vue'
+import gsap from 'gsap'
 
 const newTodo = ref('')
 const todos = ref([])
@@ -17,35 +18,61 @@ const deleteTodo = (id) => {
     return todo.id !== id
   })
 }
+
+const beforeEnter = (el) => {
+  el.style.opacity = 0
+  el.style.transform = 'translateY(60px)'
+}
+
+const enter = (el, done) => {
+  gsap.to(el, 1, {
+    y: 0,
+    opacity: 1,
+    onComplete: done,
+  })
+}
+
+onMounted(() => {
+  const initTodos = localStorage.getItem('todos')
+  if (initTodos) {
+    todos.value = JSON.parse(initTodos)
+  }
+
+  watch(todos, () => {
+    localStorage.setItem('todos', JSON.stringify(todos.value))
+  })
+})
 </script>
 
 <template>
-  <div class="todos">
-    <input
-      type="text"
-      placeholder="Add new todo..."
-      class="mb-6 h-10 w-80 rounded-md px-2 text-sm shadow-md transition-shadow duration-200 ease-in focus:shadow-teal-500/50 focus:outline-none"
-      v-model="newTodo"
-      @keyup.enter="addTodo"
-    />
-    <Transition name="switch" mode="out-in">
-      <div v-if="todos.length">
-        <TransitionGroup tag="ul" name="list" appear>
-          <li
-            v-for="todo in todos"
-            :key="todo.id"
-            @click="deleteTodo(todo.id)"
-            class="mb-4 grid h-12 w-80 place-items-center rounded-md bg-white text-center shadow-md transition-shadow duration-300 ease-in hover:cursor-pointer hover:shadow-lg active:shadow-teal-500/50"
-          >
-            {{ todo.text }}
-          </li>
-        </TransitionGroup>
-      </div>
-      <div v-else class="text-center">
-        <span class="opacity-50">There are no tasks...</span>
-      </div>
-    </Transition>
-  </div>
+  <Transition name="fade" @before-enter="beforeEnter" @enter="enter" appear>
+    <div class="todos">
+      <input
+        type="text"
+        placeholder="Add new todo..."
+        class="mb-6 h-10 w-80 rounded-md px-2 text-sm shadow-md transition-shadow duration-200 ease-in focus:shadow-teal-500/50 focus:outline-none"
+        v-model="newTodo"
+        @keyup.enter="addTodo"
+      />
+      <Transition name="switch" mode="out-in">
+        <div v-if="todos.length">
+          <TransitionGroup tag="ul" name="list" appear>
+            <li
+              v-for="todo in todos"
+              :key="todo.id"
+              @click="deleteTodo(todo.id)"
+              class="mb-4 grid h-12 w-80 place-items-center rounded-md bg-white text-center shadow-md transition-shadow duration-300 ease-in hover:cursor-pointer hover:shadow-lg active:shadow-teal-500/50"
+            >
+              {{ todo.text }}
+            </li>
+          </TransitionGroup>
+        </div>
+        <div v-else class="text-center">
+          <span class="opacity-50">There are no tasks...</span>
+        </div>
+      </Transition>
+    </div>
+  </Transition>
 </template>
 
 <style scoped>

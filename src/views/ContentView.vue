@@ -9,8 +9,7 @@ const beforeEnter = (el) => {
 }
 
 const enter = (el, done) => {
-  gsap.to(el, {
-    duration: 1,
+  gsap.to(el, 1, {
     y: 0,
     opacity: 0.8,
     onComplete: done,
